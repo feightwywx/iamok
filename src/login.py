@@ -1,5 +1,6 @@
 from .api.aes import aes_encrypt
 from . import apiurl
+from . import logger
 import requests
 import json
 
@@ -29,10 +30,11 @@ def get_token(username, password):
     }
     login_resp = requests.post(apiurl, data=data, headers=login_headers)
     login_resp.raise_for_status()
-    print(login_resp.status_code, login_resp.text)
+    logger.debug('[{}]{}'.format(login_resp.status_code, login_resp.text))
     login_resp_json = json.loads(login_resp.text)
     if login_resp_json['result'] == 0:
-        token = login_resp_json['data']['token']
+        token = login_resp_json['data']['token']  
     else:
+        logger.error(login_resp_json['message'])
         token = None
     return token

@@ -1,16 +1,19 @@
 from . import apiurl
 from .login import get_token
 from .api.aes import aes_encrypt
+from . import logger
 from requests.sessions import session
 from copy import copy
 import json
 
 
 def bpa(username, password):
-    print('学号 {} 同学开始报平安'.format(username))
+    logger.info('学号 {} 同学开始报平安'.format(username))
     username = str(username)
     password = str(password)
     token = get_token(username, password)
+    if token is None:
+        return -2
 
     index_headers = {
         'Accept': '*/*',
@@ -40,7 +43,7 @@ def bpa(username, password):
             'token': token
         })
     }, headers=index_headers)
-    print(view_resp.status_code, view_resp.text)
+    logger.debug('[{}]{}'.format(view_resp.status_code, view_resp.text))
 
     # 检查当日是否已报平安
     stat_resp = bpa_session.post(apiurl, data={
@@ -51,7 +54,7 @@ def bpa(username, password):
             'token': token
         })
     }, headers=index_headers)
-    print(stat_resp.status_code, stat_resp.text)
+    logger.debug('[{}]{}'.format(stat_resp.status_code, stat_resp.text))
     sm_code = stat_resp.json()['data']['sm']  # 报平安状态
     if sm_code == '1':  # 未报平安
         bpa_uri = 'http://bpa.haust.edu.cn/xgh5/stu/bpa/yq_info.html?' + \
@@ -71,7 +74,7 @@ def bpa(username, password):
                 'token': token
             })
         }, headers=bpa_headers)
-        print(stupic_resp.status_code, '*** Student profile picture ***')
+        logger.debug('[{}]{}'.format(stupic_resp.status_code, '*** Student profile picture ***'))
 
         # 获取学生信息
         getdata_resp = bpa_session.get(apiurl, params={
@@ -83,8 +86,10 @@ def bpa(username, password):
                 'token': token
             })
         }, headers=bpa_headers)
-        print(getdata_resp.status_code, getdata_resp.text)
+        logger.debug('[{}]{}'.format(getdata_resp.status_code, getdata_resp.text))
         studata = getdata_resp.json()['data']
+        if not studata:
+            return -2
 
         # 报平安
         commit_resp = bpa_session.post(apiurl, data={
@@ -126,10 +131,10 @@ def bpa(username, password):
                 }
             })
         }, headers=bpa_headers)
-        print(commit_resp.status_code, commit_resp.text)
+        logger.debug('[{}]{}'.format(commit_resp.status_code, commit_resp.text))
         commit_status = commit_resp.json()['result']
         if commit_status == 0:  # 报平安成功
-            print('报平安成功')
+            logger.info('{} 同学已成功报平安'.format(studata['xm']))
 
             # 请求报平安情况
             bpa_list_uri = 'http://bpa.haust.edu.cn/xgh5/stu/bpa/yq_list.html?' + \
@@ -150,18 +155,19 @@ def bpa(username, password):
                     'token': token
                 })
             }, headers=bpa_list_headers)
-            print(list_resp.status_code, list_resp.text)
+            logger.debug('[{}]{}'.format(list_resp.status_code, list_resp.text))
             bpa_count = list_resp.json()['data']['zsbts']
             bpa_mon_count = list_resp.json()['data']['bysbts']
-            print('总报平安次数 {} ，本月报平安 {} 次。'.format(
+            logger.info('总报平安次数 {} ，本月报平安 {} 次。'.format(
                 bpa_count, bpa_mon_count
             ))
             return 0
         else:
             pass
     elif sm_code == '-1':
-        print('今日已报过平安')
+        logger.warning('{} 今日已报过平安'.format(username))
+        return -1
     else:
         pass
-    print('报平安失败，请检查')
-    return -1
+    logger.error('报平安失败，请检查')
+    return -2
