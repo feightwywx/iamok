@@ -11,6 +11,7 @@ def bpa_once(username, password):
     try:
         stat = bpa(username, password)
     except Exception as e:
+        logger.critical(str(e))
         stat = -2
     if stat == 0 or stat == -1:
         # 成功执行或已报，延时24小时
