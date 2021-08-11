@@ -95,7 +95,6 @@ def bpa(username, password):
         commit_resp = bpa_session.post(apiurl, data={
             'command': 'XGXT',
             'param': json.dumps({
-                {
                     'cmd': 'yqsbFormSave',
                     'xh': studata['xh'],
                     'sbsj': studata['sbsjS'],
@@ -129,7 +128,7 @@ def bpa(username, password):
                     'zysj': '',
                     'token': token
                 }
-            })
+            )
         }, headers=bpa_headers)
         logger.debug('[{}]{}'.format(commit_resp.status_code, commit_resp.text))
         commit_status = commit_resp.json()['result']

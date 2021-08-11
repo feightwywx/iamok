@@ -6,6 +6,7 @@ import os.path
 import time
 from src import logger
 from src.bpa import bpa
+from random import randint
 
 def bpa_once(username, password):
     try:
@@ -14,15 +15,15 @@ def bpa_once(username, password):
         logger.critical(str(e))
         stat = -2
     if stat == 0 or stat == -1:
-        # 成功执行或已报，延时24小时
-        Timer(86400, bpa_once, (username, password)).start()
+        # 成功执行或已报，延时23~25小时
+        Timer(86400 + randint(-3600, 3600), bpa_once, (username, password)).start()
         logger.info('{username} 已报平安。下次报平安时间：{time}'.format(
             username=username,
             time=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time() + 86400))
         ))
     else:
-        # 失败，延时半小时
-        Timer(1800, bpa_once, (username, password)).start()
+        # 失败，延时15~45分钟
+        Timer(1800 + randint(-900, 900), bpa_once, (username, password)).start()
         logger.info('{username} 报平安失败，将在30分钟后重试。预计报平安时间：{time}'.format(
             username=username,
             time=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time() + 1800))
