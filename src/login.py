@@ -14,10 +14,10 @@ def get_token(username, password):
         'Connection': 'keep-alive',
         'Content-Type': 'application/x-www-form-urlencoded',
         'DNT': '1',
-        'Host': 'bpa.haust.edu.cn',
-        'Origin': 'http://bpa.haust.edu.cn',
+        'Host': 'swxg.haust.edu.cn',
+        'Origin': 'https://swxg.haust.edu.cn',
         'Pragma': 'no-cache',
-        'Referer': 'http://bpa.haust.edu.cn/xgh5/login.html',
+        'Referer': 'https://swxg.haust.edu.cn/xgh5/login.html',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36 Edg/92.0.902.67',
         'X-Requested-With': 'XMLHttpRequest'
     }

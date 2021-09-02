@@ -7,10 +7,11 @@ from copy import copy
 import json
 
 
-def bpa(username, password):
+def bpa(username, password, mailcode):
     logger.info('学号 {} 同学开始报平安'.format(username))
     username = str(username)
     password = str(password)
+    mailcode = str(mailcode)
     token = get_token(username, password)
     if token is None:
         return -2
@@ -23,10 +24,10 @@ def bpa(username, password):
         'Connection': 'keep-alive',
         'Content-Type': 'application/x-www-form-urlencoded',
         'DNT': '1',
-        'Host': 'bpa.haust.edu.cn',
-        'Origin': 'http://bpa.haust.edu.cn',
+        'Host': 'swxg.haust.edu.cn',
+        'Origin': 'https://swxg.haust.edu.cn',
         'Pragma': 'no-cache',
-        'Referer': 'http://bpa.haust.edu.cn/xgh5/stu/index.html',
+        'Referer': 'https://swxg.haust.edu.cn/xgh5/stu/index.html',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36 Edg/92.0.902.67',
         'X-Requested-With': 'XMLHttpRequest'
     }
@@ -57,7 +58,7 @@ def bpa(username, password):
     logger.debug('[{}]{}'.format(stat_resp.status_code, stat_resp.text))
     sm_code = stat_resp.json()['data']['sm']  # 报平安状态
     if sm_code == '1':  # 未报平安
-        bpa_uri = 'http://bpa.haust.edu.cn/xgh5/stu/bpa/yq_info.html?' + \
+        bpa_uri = 'https://swxg.haust.edu.cn/xgh5/stu/bpa/yq_info.html?' + \
             aes_encrypt('xh={xh}&token={token}'.format(
                 xh=username, token=token
             ))
@@ -100,7 +101,7 @@ def bpa(username, password):
                     'sbsj': studata['sbsjS'],
                     'nl': studata['nl'],
                     'lxfs': studata['lxdh'],
-                    'jzdq': studata['jzdq'],
+                    'jzdq': mailcode,
                     'jzdq_xxdz': studata['jzdqXxdz'],
                     'tw': '36.5',
                     'sflx': '0',
@@ -136,7 +137,7 @@ def bpa(username, password):
             logger.info('{} 同学已成功报平安'.format(studata['xm']))
 
             # 请求报平安情况
-            bpa_list_uri = 'http://bpa.haust.edu.cn/xgh5/stu/bpa/yq_list.html?' + \
+            bpa_list_uri = 'https://swxg.haust.edu.cn/xgh5/stu/bpa/yq_list.html?' + \
                 aes_encrypt('xh={xh}&token={token}'.format(
                     xh=username, token=token
                 ))

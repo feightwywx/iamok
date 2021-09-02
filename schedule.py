@@ -8,9 +8,9 @@ from src.bpa import bpa
 from random import randint
 from src.db import insert_record
 
-def bpa_once(username, password, bpatime: tuple =(8, 0), interval=60):
+def bpa_once(username, password, mailcode, bpatime: tuple =(8, 0), interval=60):
     try:
-        stat = bpa(username, password)
+        stat = bpa(username, password, mailcode)
     except Exception as e:
         logger.critical(str(e))
         stat = -2
@@ -59,7 +59,8 @@ def gen_config():
         'user': [
             {
                 'username': '123456',
-                'password': '123456'
+                'password': '123456',
+                'mailcode': '100000'
             }
         ]
     }, indent=4)
@@ -81,6 +82,6 @@ with open('config.json', mode='r') as configf:
         
 # 存在config.json
 for each in config['user']:
-    bpa_once(each['username'], each['password'])
+    bpa_once(each['username'], each['password'], each['mailcode'])
 
         
