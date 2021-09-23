@@ -8,7 +8,7 @@ from src.bpa import bpa
 from random import randint
 from src.db import insert_record
 
-def bpa_once(username, password, mailcode, bpatime: tuple =(8, 0), interval=60):
+def bpa_once(username, password, mailcode, bpatime: tuple =(6, 0), interval=60):
     try:
         stat = bpa(username, password, mailcode)
     except Exception as e:
@@ -35,7 +35,7 @@ def bpa_once(username, password, mailcode, bpatime: tuple =(8, 0), interval=60):
     if stat == 0 or stat == -1:
         offseted_time = now_time + one_day_after
         # 成功执行或已报，延时23~25小时
-        Timer(one_day_after, bpa_once, (username, password)).start()
+        Timer(one_day_after, bpa_once, (username, password, mailcode)).start()
         logger.info('{username} 已报平安。下次报平安时间：{time}'.format(
             username=username,
             time=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(offseted_time))
@@ -43,7 +43,7 @@ def bpa_once(username, password, mailcode, bpatime: tuple =(8, 0), interval=60):
     else:
         offseted_time = now_time + half_hr_after
         # 失败，延时15~45分钟
-        Timer(half_hr_after, bpa_once, (username, password)).start()
+        Timer(half_hr_after, bpa_once, (username, password, mailcode)).start()
         logger.info('{username} 报平安失败，将在一会之后重试。预计报平安时间：{time}'.format(
             username=username,
             time=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(offseted_time))
